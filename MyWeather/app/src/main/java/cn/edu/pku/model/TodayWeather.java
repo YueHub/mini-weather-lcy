@@ -1,4 +1,4 @@
-package cn.edu.pku.bean;
+package cn.edu.pku.model;
 
 /**
  * Created by Yue on 2016/9/27.

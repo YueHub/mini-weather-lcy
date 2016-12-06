@@ -1,17 +1,16 @@
-package cn.edu.pku.myweather;
+package cn.edu.pku.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
-import cn.edu.pku.bean.City;
+import cn.edu.pku.activities.R;
+import cn.edu.pku.model.City;
 
 /**
  * Created by Yue on 2016/10/11.

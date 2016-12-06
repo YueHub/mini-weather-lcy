@@ -1,4 +1,4 @@
-package cn.edu.pku.myweather;
+package cn.edu.pku.activities;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.edu.pku.bean.City;
+import cn.edu.pku.model.City;
 
 /**
  * Created by Yue on 2016/9/27.

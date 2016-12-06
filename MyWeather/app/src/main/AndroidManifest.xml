@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.edu.pku.myweather">
+    package="cn.edu.pku.activities">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -13,17 +13,31 @@
         android:theme="@style/AppTheme">
 
     <activity
-        android:name=".MainActivity"
-        android:label="我的天气预报APP">
+        android:name="cn.edu.pku.activities.StartActivity"
+        android:label="APP Start">
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter>
     </activity>
 
-    <activity android:name=".SelectCity" >
+    <activity
+        android:name="cn.edu.pku.activities.WelcomeActivity"
+        android:label="欢迎">
+    </activity>
+
+    <activity
+        android:name="cn.edu.pku.activities.MainActivity"
+        android:label="天气预报">
+    </activity>
+
+    <activity android:name="cn.edu.pku.activities.SelectCity" >
 
     </activity>
-    </application>
 
+    <service android:name="cn.edu.pku.service.AutoUpdateService">
+
+    </service>
+
+    </application>
 </manifest>

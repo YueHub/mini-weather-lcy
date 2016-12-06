@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.edu.pku.bean.City;
+import cn.edu.pku.model.City;
 import cn.edu.pku.db.CityDB;
 
 /**
