@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">YueWeather</string>
+    <string name="app_start_hello">欢迎使用</string>
+    <string name="app_guide_use">开始使用</string>
+</resources>

@@ -8,17 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,11 +29,10 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-import cn.edu.pku.fragment.Fragment1;
-import cn.edu.pku.fragment.Fragment2;
-import cn.edu.pku.fragment.Fragment3;
-import cn.edu.pku.fragment.Fragment4;
+import cn.edu.pku.adapter.MyPagerAdapter;
 import cn.edu.pku.model.TodayWeather;
 import cn.edu.pku.service.AutoUpdateBinder;
 import cn.edu.pku.service.AutoUpdateService;
@@ -44,26 +41,25 @@ import cn.edu.pku.util.NetUtil;
 /**
  * Created by 22253 on 2016/9/18.
  */
-public class MainActivity extends FragmentActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
-    private ImageView mUpdateBtn;
-    private ImageView mCityBtn;
-    private ProgressBar updateProcess;
+    private ImageView mUpdateBtn;   // 更新按钮
+    private ImageView mCityBtn; // 选择城市按钮
+    private ProgressBar updateProcess;  // 更新进度
 
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv;
     private TextView temperatureTv, climateTv, windTv, wenduTv;
-    private ImageView weatherImg, pmImg;
+
+    private ImageView weatherImg, pmImg;    // 天气图片
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
     private AutoUpdateBinder autoUpdateBinder;
 
-    private RadioGroup navigationBar;
-    private RadioButton btn1, btn2, btn3, btn4;
-    private Fragment fragment1, fragment2, fragment3, fragment4;
-
-    private Fragment mFragment;//当前显示的Fragment
-
+    // ViewPaper
+    private ViewPager mViewPager;
+    private MyPagerAdapter myAdapter;
+    private List<View> viewList = new ArrayList<View>();
 
     private Handler mHandler = new Handler() {
 
@@ -123,99 +119,27 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         //startService(new Intent(getBaseContext(), AutoUpdateService.class));
         Intent bindIntent = new Intent(this, AutoUpdateService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
+
+
+        // ViewPaper
+        LayoutInflater inflater = LayoutInflater.from(this);
+        viewList.add(inflater.inflate(R.layout.next_days_1,null));
+        viewList.add(inflater.inflate(R.layout.next_days_2,null));
+        viewList.add(inflater.inflate(R.layout.next_days_3,null));
+        myAdapter = new MyPagerAdapter(viewList);
+        mViewPager = (ViewPager) this.findViewById(R.id.mViewPager2);
+        mViewPager.setAdapter(myAdapter);
+        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
+        //mViewPager.setOffscreenPageLimit(viewList.size());
+
         // 初始化界面
-        initViews();
         initView();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.main_fragment, fragment1).commit();
-        mFragment = fragment1;
 
-    }
-
-    private void initViews() {
-        navigationBar = (RadioGroup) findViewById(R.id.navigation_btn);
-        btn1 = (RadioButton) findViewById(R.id.btn1);
-        btn2 = (RadioButton) findViewById(R.id.btn2);
-        btn3 = (RadioButton) findViewById(R.id.btn3);
-        btn4 = (RadioButton) findViewById(R.id.btn4);
-        navigationBar.setOnCheckedChangeListener(this);
-
-        fragment1 = new Fragment1();
-        fragment2 = new Fragment2();
-        fragment3 = new Fragment3();
-        fragment4 = new Fragment4();
-    }
-    /**碎片**/
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.btn1:
-                btn1.setChecked(true);
-                btn2.setChecked(false);
-                btn3.setChecked(false);
-                btn4.setChecked(false);
-                switchFragment(fragment1);
-                break;
-            case R.id.btn2:
-                btn1.setChecked(false);
-                btn2.setChecked(true);
-                btn3.setChecked(false);
-                btn4.setChecked(false);
-                switchFragment(fragment2);
-
-                break;
-            case R.id.btn3:
-                btn1.setChecked(false);
-                btn2.setChecked(false);
-                btn3.setChecked(true);
-                btn4.setChecked(false);
-                switchFragment(fragment3);
-
-                break;
-            case R.id.btn4:
-                btn1.setChecked(false);
-                btn2.setChecked(false);
-                btn3.setChecked(false);
-                btn4.setChecked(true);
-                switchFragment(fragment4);
-
-                break;
-        }
-    }
-
-    private void switchFragment(Fragment fragment) {
-        //判断当前显示的Fragment是不是切换的Fragment
-        if (mFragment != fragment) {
-            //判断切换的Fragment是否已经添加过
-            if (!fragment.isAdded()) {
-                //如果没有，则先把当前的Fragment隐藏，把切换的Fragment添加上
-                getSupportFragmentManager().beginTransaction().hide(mFragment)
-                        .add(R.id.main_fragment, fragment).commit();
-            } else {
-                //如果已经添加过，则先把当前的Fragment隐藏，把切换的Fragment显示出来
-                getSupportFragmentManager().beginTransaction().hide(mFragment).show(fragment).commit();
-            }
-            mFragment = fragment;
-        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
 //        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-        if (fragment1 == null && fragment instanceof Fragment1){
-            fragment1 = fragment;
-        } else if (fragment2 == null && fragment instanceof Fragment2){
-            fragment2 = fragment;
-        }else if (fragment3 == null && fragment instanceof Fragment3){
-            fragment3 = fragment;
-        }else if (fragment4 == null && fragment instanceof Fragment4){
-            fragment4 = fragment;
-        }
     }
 
 
@@ -431,6 +355,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         windTv.setText("N/A");
         wenduTv.setText("N/A");
         // 开始服务
+
+
 
 
     }

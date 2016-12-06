@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
 
     <activity
-        android:name="cn.edu.pku.activities.StartActivity"
+        android:name=".GuideActivity"
         android:label="APP Start">
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
@@ -22,7 +22,7 @@
     </activity>
 
     <activity
-        android:name="cn.edu.pku.activities.WelcomeActivity"
+        android:name=".StartActivity"
         android:label="欢迎">
     </activity>
 

@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">MyWeather</string>
+    <string name="app_name">YueWeather</string>
+    <string name="app_start_hello">Welcome</string>
+    <string name="app_guide_use">Start Use</string>
 </resources>
