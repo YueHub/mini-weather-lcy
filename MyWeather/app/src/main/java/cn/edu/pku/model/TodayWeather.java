@@ -1,30 +1,84 @@
 package cn.edu.pku.model;
 
+import java.util.List;
+
 /**
  * Created by Yue on 2016/9/27.
  */
 public class TodayWeather {
 
-    private String city;
+    /**
+     * 城市名称
+     */
+    private String cityName;
+
+    /**
+     * 更新时间
+     */
     private String udpateTime;
+
+    /**
+     * 温度
+     */
     private String wendu;
+
+    /**
+     * 湿度
+     */
     private String shidu;
+
+    /**
+     * pm2.5数值
+     */
     private String pm25;
+
+    /**
+     * 空气质量
+     */
     private String quality;
+
+    /**
+     * 风向
+     */
     private String fengxiang;
+
+    /**
+     * 风力
+     */
     private String fengli;
+
+    /**
+     * 日期
+     */
     private String date;
+
+    /**
+     * 最高温度
+     */
     private String high;
+
+    /**
+     * 最低温度
+     */
     private String low;
+
+    /**
+     * 天气（晴朗、雨天..）
+     */
     private String type;
 
+    /**
+     * 未来几天天气
+     */
+    private List<FutureWeather> futureWeathers;
 
-    public String getCity() {
-        return city;
+
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
     public String getUdpateTime() {
@@ -113,5 +167,13 @@ public class TodayWeather {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<FutureWeather> getFutureWeathers() {
+        return futureWeathers;
+    }
+
+    public void setFutureWeathers(List<FutureWeather> futureWeathers) {
+        this.futureWeathers = futureWeathers;
     }
 }

@@ -70,7 +70,7 @@ public class WeatherUpdateUtil {
                         }
                         if(xmlPullParser.getName().contentEquals("city")) {
                             eventType = xmlPullParser.next();
-                            todayWeather.setCity(xmlPullParser.getText());
+                            todayWeather.setCityName(xmlPullParser.getText());
                             Log.d("myapp2", "city:" + xmlPullParser.getText());
                         } else if(xmlPullParser.getName().contentEquals("updatetime")) {
                             eventType = xmlPullParser.next();

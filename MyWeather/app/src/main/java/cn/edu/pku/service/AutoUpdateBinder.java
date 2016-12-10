@@ -1,12 +1,6 @@
 package cn.edu.pku.service;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Binder;
-import android.os.Looper;
 import android.util.Log;
 
 import cn.edu.pku.activities.MainActivity;
@@ -24,7 +18,7 @@ public class AutoUpdateBinder extends Binder {
 
                     Log.d("Service", "This is a Service");
                     // Looper.prepare();
-                    mainActivity.queryWeatherCode("101010100");
+                    mainActivity.queryWeather("101010100");
                     //  Looper.loop();
                     try {
                         Thread.sleep(5000000);
