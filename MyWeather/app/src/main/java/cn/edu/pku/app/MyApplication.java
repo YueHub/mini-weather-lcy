@@ -2,7 +2,6 @@ package cn.edu.pku.app;
 
 import android.app.Application;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,8 +9,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.edu.pku.model.City;
 import cn.edu.pku.db.CityDB;
+import cn.edu.pku.model.City;
 
 /**
  * Created by Yue on 2016/9/27.
@@ -19,14 +18,22 @@ import cn.edu.pku.db.CityDB;
 public class MyApplication extends Application {
 
     private static MyApplication myApplication;
+
+    /**
+     * 访问城市数据库对象
+     */
     private CityDB mCityDB;
+
+    /**
+     * 城市列表
+     */
     private List<City> mCityList;
 
     @Override
     public void onCreate() {
         super.onCreate();
         myApplication = this;
-        mCityDB = openCityDB();
+        mCityDB = openCityDB(); // 获取访问城市数据库的对象（/data/database1/city.db）
         initCityList();
     }
 
@@ -34,6 +41,11 @@ public class MyApplication extends Application {
         return myApplication;
     }
 
+    /**
+     * 获取访问城市数据库的对象
+     * /data/database1/city.db
+     * @return
+     */
     private CityDB openCityDB() {
         String path = "/data"
                 + Environment.getDataDirectory().getAbsolutePath()
@@ -71,6 +83,9 @@ public class MyApplication extends Application {
         return new CityDB(this, path);
     }
 
+    /**
+     * 多线程初始化城市列表
+     */
     private void initCityList() {
         mCityList = new ArrayList<City>();
         new Thread(new Runnable() {
@@ -81,24 +96,16 @@ public class MyApplication extends Application {
         }).start();
     }
 
+    /**
+     * 由城市数据库对象获取城市列表
+     * @return
+     */
     private boolean prepareCityList() {
         mCityList = mCityDB.getAllCity();
-        int i = 0;
-        for(City city : mCityList) {
-            ++i;
-            String cityName = city.getCity();
-            String cityCode = city.getNumber();
-            Log.d("TAG", cityCode + ":" + cityName);
-        }
-        Log.d("TAG", "i="+i);
         return true;
     }
 
     public List<City> getmCityList() {
         return mCityList;
-    }
-
-    public void setmCityList(List<City> mCityList) {
-        this.mCityList = mCityList;
     }
 }

@@ -1,7 +1,6 @@
 package cn.edu.pku.service;
 
 import android.os.Binder;
-import android.util.Log;
 
 import cn.edu.pku.activities.MainActivity;
 
@@ -15,13 +14,11 @@ public class AutoUpdateBinder extends Binder {
             @Override
             public void run() {
                 while(true) {
-
-                    Log.d("Service", "This is a Service");
                     // Looper.prepare();
                     mainActivity.queryWeather("101010100");
                     //  Looper.loop();
                     try {
-                        Thread.sleep(5000000);
+                        Thread.sleep(900000);  // 每隔15分钟 后台服务自动更新一次天气
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

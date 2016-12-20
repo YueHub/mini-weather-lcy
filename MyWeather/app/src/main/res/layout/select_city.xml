@@ -7,7 +7,7 @@
         android:layout_height="45.0dip"
         android:background="#ffcd2626">
         <TextView
-            android:id="@+id/title_name"
+            android:id="@+id/current_city"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center"
@@ -43,7 +43,7 @@
         android:drawableLeft="@drawable/search_bar_icon_normal"
         android:hint="请输入关键字"
         android:singleLine="true"
-        android:textSize="15.0dip" />
+        android:textSize="20.0dip" />
 
     <FrameLayout
         android:layout_width="fill_parent"
@@ -51,7 +51,7 @@
 
         <ListView
             android:id="@+id/city_list"
-            android:layout_marginTop="80dip"
+            android:layout_marginTop="85dip"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center"

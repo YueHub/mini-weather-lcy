@@ -22,15 +22,16 @@ public class StartActivity extends Activity {
         setContentView(R.layout.start_activity_layout);
         initData();
     }
+
     private void initData() {
         SharedPreferences sp = getSharedPreferences("StartActivity", 0);
         isFirstStart = sp.getBoolean("isFirst",true);
-        /* 判断是否第一次打开App,如果是则跳转至引导页，否则跳转到主页 */
+        // 判断是否第一次打开App,如果是则跳转至引导页，否则跳转到主页
         if (isFirstStart) {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    gotoStartActivity();
+                    gotoGuideActivity();
                 }
             }, 2000);
             SharedPreferences.Editor editor = sp.edit();
@@ -45,13 +46,20 @@ public class StartActivity extends Activity {
             }, 2000);
         }
     }
+
+    /**
+     * 进入主界面
+     */
     private void gotoMainActivity() {
         Intent intent = new Intent(StartActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    private void gotoStartActivity() {
+    /**
+     * 进入引导界面
+     */
+    private void gotoGuideActivity() {
         Intent intent = new Intent(StartActivity.this, GuideActivity.class);
         startActivity(intent);
         finish();

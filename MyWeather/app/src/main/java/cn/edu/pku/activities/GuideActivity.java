@@ -14,18 +14,18 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.edu.pku.adapter.MyPagerAdapter;
+import cn.edu.pku.adapter.MyViewPagerAdapter;
 
 /**
  * Created by Yue on 2016/11/29.
  */
 public class GuideActivity extends Activity implements ViewPager.OnPageChangeListener {
 
-    private ViewPager mViewPager;
+    private ViewPager myViewPager;
     private List<View> viewList = new ArrayList<View>();
-    private MyPagerAdapter myAdapter;
+    private MyViewPagerAdapter myViewPagerAdapter;
     private ImageView[] indicationPoint; // 指示点控件
-    private int[] points = {R.id.point1,R.id.point2,R.id.point3};
+    private int[] points = {R.id.point1, R.id.point2, R.id.point3};
     private Button btnStart;
 
     @Override
@@ -36,6 +36,10 @@ public class GuideActivity extends Activity implements ViewPager.OnPageChangeLis
         initData();
         initViews();
     }
+
+    /**
+     * 初始化ViewPager数据 三页引导页
+     */
     private void initData() {
         LayoutInflater inflater = LayoutInflater.from(this);
         viewList.add(inflater.inflate(R.layout.guide_activity_background1_layout,null));
@@ -47,19 +51,21 @@ public class GuideActivity extends Activity implements ViewPager.OnPageChangeLis
             indicationPoint[i] = (ImageView) findViewById(points[i]);
         }
     }
+
+    /**
+     * 初始化ViewPager界面
+     */
     private void initViews() {
-        myAdapter = new MyPagerAdapter(viewList);
-        mViewPager = (ViewPager) this.findViewById(R.id.mViewPager);
-        mViewPager.setAdapter(myAdapter);
-        // mViewPager.setPageTransformer(true, new DepthPageTransformer());
-        // mViewPager.setOffscreenPageLimit(viewList.size());
-        mViewPager.setOnPageChangeListener(this);
+        myViewPagerAdapter = new MyViewPagerAdapter(viewList);
+        myViewPager = (ViewPager) this.findViewById(R.id.mViewPager);
+        myViewPager.setAdapter(myViewPagerAdapter);
+        myViewPager.setOnPageChangeListener(this);
         btnStart = (Button) viewList.get(viewList.size()-1).findViewById(R.id.start);
         // 启动主页面
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GuideActivity.this,MainActivity.class);
+                Intent intent = new Intent(GuideActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }

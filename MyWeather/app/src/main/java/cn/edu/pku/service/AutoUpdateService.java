@@ -13,8 +13,6 @@ import android.util.Log;
  */
 public class AutoUpdateService extends Service {
 
-    public static final String TAG = "AutoUpdateService";
-
     private AutoUpdateBinder autoUpdateBinder = new AutoUpdateBinder();
 
     @Override

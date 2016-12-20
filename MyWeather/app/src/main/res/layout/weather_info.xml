@@ -266,11 +266,9 @@
 
             </RelativeLayout>
 
-
         </RelativeLayout>
 
         <!--七日天气 -->
-        <!-- 广告 -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">

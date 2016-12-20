@@ -22,22 +22,19 @@
             android:id="@+id/point1"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/page_indicator_focused"
-        />
+            android:src="@drawable/page_indicator_focused" />
 
         <ImageView
             android:id="@+id/point2"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/page_indicator_unfocused"
-        />
+            android:src="@drawable/page_indicator_unfocused" />
 
         <ImageView
             android:id="@+id/point3"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/page_indicator_unfocused"
-        />
+            android:src="@drawable/page_indicator_unfocused" />
     </LinearLayout>
 
 

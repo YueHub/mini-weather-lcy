@@ -5,17 +5,35 @@ package cn.edu.pku.model;
  */
 public class City {
 
+    /**
+     * 身份
+     */
     private String province;
 
+    /**
+     * 城市
+     */
     private String city;
 
+    /**
+     * 代号
+     */
     private String number;
 
-    private String firstPY;
-
+    /**
+     * 拼音
+     */
     private String allPY;
 
+    /**
+     * 所有首字母拼音组合
+     */
     private String allFirstPY;
+
+    /**
+     * 第一个首字母
+     */
+    private String firstPY;
 
     public City(String province, String city, String number, String firstPY, String allPY, String allFirstPY) {
         this.province = province;
@@ -50,14 +68,6 @@ public class City {
         this.number = number;
     }
 
-    public String getFirstPY() {
-        return firstPY;
-    }
-
-    public void setFirstPY(String firstPY) {
-        this.firstPY = firstPY;
-    }
-
     public String getAllPY() {
         return allPY;
     }
@@ -72,5 +82,13 @@ public class City {
 
     public void setAllFirstPY(String allFirstPY) {
         this.allFirstPY = allFirstPY;
+    }
+
+    public String getFirstPY() {
+        return firstPY;
+    }
+
+    public void setFirstPY(String firstPY) {
+        this.firstPY = firstPY;
     }
 }

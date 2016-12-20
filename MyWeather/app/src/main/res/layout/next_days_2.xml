@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_toRightOf="@id/day4"
+            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true">
 
             <!-- 天气情况图片示例 -->

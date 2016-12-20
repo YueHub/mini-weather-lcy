@@ -20,6 +20,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -32,7 +36,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.edu.pku.adapter.MyPagerAdapter;
+import cn.edu.pku.adapter.MyViewPagerAdapter;
 import cn.edu.pku.model.FutureWeather;
 import cn.edu.pku.model.TodayWeather;
 import cn.edu.pku.service.AutoUpdateBinder;
@@ -45,14 +49,21 @@ import cn.edu.pku.util.NetUtil;
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
     /**
+     * 选择城市按钮
+     */
+    private ImageView mCityBtn;
+
+    /**
+     * 城市定位按钮
+     */
+    private ImageView locationBtn;
+
+    /**
      * 更新按钮
      */
     private ImageView mUpdateBtn;
 
-    /**
-     * 选择城市按钮
-     */
-    private ImageView mCityBtn;
+
 
     /**
      * 更新进度
@@ -82,11 +93,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
      */
     private List<TextView> fengLis;
 
-
     /**
      * 天气图片
      */
     private ImageView weatherImg, pmImg;
+
+    /**
+     * 百度定位客户端
+     */
+    public LocationClient mLocationClient = null;
+
+    /**
+     * 百度定位监听
+     */
+    public BDLocationListener myListener = new MyLocationListener();
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
@@ -94,9 +114,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private MainActivity mainActivity = this;
 
-    private ViewPager mViewPager;   // ViewPaper
-    private MyPagerAdapter myAdapter;
-    private List<View> viewList = new ArrayList<View>();
+    private ViewPager myViewPager;   // ViewPaper
+    private MyViewPagerAdapter myViewPagerAdapter;
+    private List<View> viewList = new ArrayList<View>();    // ViewPaper的ViewList
 
 
     /**
@@ -135,41 +155,33 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_info);
 
-        // 未来6天天气
-        LayoutInflater inflater = LayoutInflater.from(this);
-        viewList.add(inflater.inflate(R.layout.next_days_1, null));
-        viewList.add(inflater.inflate(R.layout.next_days_2, null));
-        myAdapter = new MyPagerAdapter(viewList);
-        mViewPager = (ViewPager) this.findViewById(R.id.mViewPager2);
-        mViewPager.setAdapter(myAdapter);
-        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
-        //mViewPager.setOffscreenPageLimit(viewList.size());
-
-        // 测试网络状态
-        /*
-        int netState = NetUtil.getNetworkState(this);
-        if(netState == NetUtil.NETWORK_WIFI) {
-            Toast.makeText(MainActivity.this, "WIFI连接", Toast.LENGTH_SHORT).show();
-        } else if(netState == NetUtil.NETWORK_MOBILE) {
-            Toast.makeText(MainActivity.this, "移动蜂窝网连接", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(MainActivity.this, "无网络", Toast.LENGTH_SHORT).show();
-        }
-        */
-
-        // 更新天气数据
-        mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
-        mUpdateBtn.setOnClickListener(this);
-        updateProcess = (ProgressBar) findViewById(R.id.update_process);
-
         // 选择城市
         mCityBtn = (ImageView) findViewById(R.id.title_city_manager);
         mCityBtn.setOnClickListener(this);
 
-        // 开始服务
+        // 城市定位
+        locationBtn = (ImageView) findViewById(R.id.title_location);
+        locationBtn.setOnClickListener(this);
+        mLocationClient = new LocationClient(getApplicationContext());     // 声明LocationClient类
+        mLocationClient.registerLocationListener(myListener);    // 注册监听函数
+        initLocation(); // 配置定位参数
+        mLocationClient.start();    // 开始定位
+
+        // 更新天气数据
+        mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
+        mUpdateBtn.setOnClickListener(this);
+        updateProcess = (ProgressBar) findViewById(R.id.update_process);    // 按钮更新动画
         //startService(new Intent(getBaseContext(), AutoUpdateService.class));
         Intent bindIntent = new Intent(this, AutoUpdateService.class);
-        bindService(bindIntent, connection, BIND_AUTO_CREATE);
+        bindService(bindIntent, connection, BIND_AUTO_CREATE);  // 绑定后台自动更新天气的服务
+
+        // 未来6天天气
+        LayoutInflater inflater = LayoutInflater.from(this);
+        viewList.add(inflater.inflate(R.layout.next_days_1, null));    // 添加滑动页面列表
+        viewList.add(inflater.inflate(R.layout.next_days_2, null));
+        myViewPagerAdapter = new MyViewPagerAdapter(viewList);
+        myViewPager = (ViewPager) this.findViewById(R.id.mViewPager2);
+        myViewPager.setAdapter(myViewPagerAdapter); // 设置适配器
 
         // 初始化界面
         initView();
@@ -187,7 +199,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             Intent intent = new Intent(this, SelectCity.class);
             startActivityForResult(intent, 1);
         }
-
         // 天气更新按钮
         if(view.getId() == R.id.title_update_btn) {
             SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
@@ -209,6 +220,27 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 Toast.makeText(this, "网络连接异常,请检查网络", Toast.LENGTH_SHORT);
             }
         }
+    }
+
+    /**
+     * 配置定位参数
+     */
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
+        );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
+        int span=1000;
+        option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setOpenGps(true);//可选，默认false,设置是否使用gps
+        option.setLocationNotify(true);//可选，默认false，设置是否当GPS有效时按照1S/1次频率输出GPS结果
+        option.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
+        option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
+        option.setIgnoreKillProcess(false);//可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
+        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
+        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤GPS仿真结果，默认需要
+        mLocationClient.setLocOption(option);
     }
 
     /**
