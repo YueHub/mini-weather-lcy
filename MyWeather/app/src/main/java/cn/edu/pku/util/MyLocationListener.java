@@ -1,4 +1,4 @@
-package cn.edu.pku.activities;
+package cn.edu.pku.util;
 
 import android.util.Log;
 

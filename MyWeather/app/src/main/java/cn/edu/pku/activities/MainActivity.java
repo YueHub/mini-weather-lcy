@@ -37,10 +37,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.edu.pku.adapter.MyViewPagerAdapter;
+import cn.edu.pku.dto.WeatherDTO;
 import cn.edu.pku.model.FutureWeather;
 import cn.edu.pku.model.TodayWeather;
 import cn.edu.pku.service.AutoUpdateBinder;
 import cn.edu.pku.service.AutoUpdateService;
+import cn.edu.pku.util.MyLocationListener;
 import cn.edu.pku.util.NetUtil;
 
 /**
@@ -49,9 +51,19 @@ import cn.edu.pku.util.NetUtil;
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
     /**
+     * 数据传输对象
+     */
+    private WeatherDTO weatherDTO = WeatherDTO.getSingleInstance();
+
+    /**
      * 选择城市按钮
      */
     private ImageView mCityBtn;
+
+    /**
+     * 标题栏城市名称
+     */
+    private TextView titleCityName;
 
     /**
      * 城市定位按钮
@@ -62,8 +74,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
      * 更新按钮
      */
     private ImageView mUpdateBtn;
-
-
 
     /**
      * 更新进度
@@ -108,16 +118,51 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
      */
     public BDLocationListener myListener = new MyLocationListener();
 
-    private static final int UPDATE_TODAY_WEATHER = 1;
-
-    private AutoUpdateBinder autoUpdateBinder;
 
     private MainActivity mainActivity = this;
 
-    private ViewPager myViewPager;   // ViewPaper
-    private MyViewPagerAdapter myViewPagerAdapter;
-    private List<View> viewList = new ArrayList<View>();    // ViewPaper的ViewList
+    /**
+     * 更新天气标识
+     */
+    private static final int UPDATE_TODAY_WEATHER = 1;
 
+    /**
+     * 自动更新天气服务绑定
+     */
+    private AutoUpdateBinder autoUpdateBinder;
+
+    /**
+     * 自动更新天气服务连接对象
+     */
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            autoUpdateBinder = (AutoUpdateBinder) service;
+
+            autoUpdateBinder.autoUpdate(mainActivity);
+        }
+    };
+
+
+    /**
+     * 未来天气ViewPaper
+     */
+    private ViewPager myViewPager;   // ViewPaper
+
+    /**
+     * 未来天气ViewPaper适配器
+     */
+    private MyViewPagerAdapter myViewPagerAdapter;
+
+    /**
+     * 未来天气View列表
+     */
+    private List<View> viewList = new ArrayList<View>();    // ViewPaper的ViewList
 
     /**
      * 接受子线程数据，配合主线程更新UI
@@ -134,30 +179,22 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     };
 
-
-
-    private ServiceConnection connection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            autoUpdateBinder = (AutoUpdateBinder) service;
-
-            autoUpdateBinder.autoUpdate(mainActivity);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_info);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        String cityCode = sharedPreferences.getString("main_city_code", "101010100");
+        weatherDTO.setCurrentCityCode(cityCode);    // 设置当前城市
+
         // 选择城市
         mCityBtn = (ImageView) findViewById(R.id.title_city_manager);
         mCityBtn.setOnClickListener(this);
+
+        // 标题栏城市名称
+        titleCityName = (TextView) findViewById(R.id.title_city_name);
+        titleCityName.setText(weatherDTO.getCurrentCityName());
 
         // 城市定位
         locationBtn = (ImageView) findViewById(R.id.title_location);
@@ -185,7 +222,72 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         // 初始化界面
         initView();
+    }
 
+    /**
+     * 初始化界面
+     */
+    public void initView() {
+        cityTv = (TextView) findViewById(R.id.city);
+        timeTv = (TextView) findViewById(R.id.time);
+        humidityTv = (TextView) findViewById(R.id.humidity);
+        weekTv = (TextView) findViewById(R.id.week_today);
+        pmDataTv = (TextView) findViewById(R.id.pm_data);
+        pmQualityTv = (TextView) findViewById(R.id.pm2_5_quality);
+        pmImg = (ImageView) findViewById(R.id.pm2_5_img);
+        temperatureTv = (TextView) findViewById(R.id.temperature);
+        climateTv = (TextView) findViewById(R.id.climate);
+        windTv = (TextView) findViewById(R.id.wind);
+        weatherImg = (ImageView) findViewById(R.id.weather_img);
+        wenduTv = (TextView) findViewById(R.id.temp_now);
+
+        // 未来天气
+        dates = new ArrayList<>();
+        temperatures = new ArrayList<>();   // 温度
+        dayTypes = new ArrayList<>();   // 白天天气情况 晴天、雨天...
+        fengLis = new ArrayList<>();    // 风力
+
+        dates.add(weekTv);  // 当前星期也在未来天气数据组中
+        dates.add((TextView)findViewById(R.id.week_today1));
+        dates.add((TextView)findViewById(R.id.week_today2));
+        dates.add((TextView)findViewById(R.id.week_today3));
+        dates.add((TextView)findViewById(R.id.week_today4));
+        dates.add((TextView)findViewById(R.id.week_today5));
+        dates.add((TextView)findViewById(R.id.week_today6));
+
+        temperatures.add(temperatureTv);
+        temperatures.add((TextView)findViewById(R.id.temperature1));
+        temperatures.add((TextView)findViewById(R.id.temperature2));
+        temperatures.add((TextView)findViewById(R.id.temperature3));
+        temperatures.add((TextView)findViewById(R.id.temperature4));
+        temperatures.add((TextView)findViewById(R.id.temperature5));
+        temperatures.add((TextView)findViewById(R.id.temperature6));
+
+        dayTypes.add(climateTv);
+        dayTypes.add((TextView)findViewById(R.id.climate1));
+        dayTypes.add((TextView)findViewById(R.id.climate2));
+        dayTypes.add((TextView)findViewById(R.id.climate3));
+        dayTypes.add((TextView)findViewById(R.id.climate4));
+        dayTypes.add((TextView)findViewById(R.id.climate5));
+        dayTypes.add((TextView)findViewById(R.id.climate6));
+
+        fengLis.add((TextView) findViewById(R.id.wind1));
+        fengLis.add((TextView) findViewById(R.id.wind2));
+        fengLis.add((TextView) findViewById(R.id.wind3));
+        fengLis.add((TextView) findViewById(R.id.wind4));
+        fengLis.add((TextView) findViewById(R.id.wind5));
+        fengLis.add((TextView) findViewById(R.id.wind6));
+
+        cityTv.setText("N/A");
+        timeTv.setText("N/A");
+        humidityTv.setText("N/A");
+        weekTv.setText("N/A");
+        pmDataTv.setText("N/A");
+        pmQualityTv.setText("N/A");
+        temperatureTv.setText("N/A");
+        climateTv.setText("N/A");
+        windTv.setText("N/A");
+        wenduTv.setText("N/A");
     }
 
     /**
@@ -196,16 +298,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View view) {
         // 点击城市选择按钮
         if(view.getId() == R.id.title_city_manager) {
-            Intent intent = new Intent(this, SelectCity.class);
+            Intent intent = new Intent(this, SelectCityActivity.class);
             startActivityForResult(intent, 1);
         }
+        // 点击城市定位按钮
+        if(view.getId() == R.id.title_location) {
+            mLocationClient.start();
+        }
+
         // 天气更新按钮
         if(view.getId() == R.id.title_update_btn) {
-            SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
-            String cityCode = sharedPreferences.getString("main_city_code", "101010100");
+            String cityCode = weatherDTO.getCurrentCityCode();
             // 网络连接是否正常
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE) {
-                Log.d("myWeather-netInfo:", "网络连接正常");
                 // 设置更新按钮不可见，旋转按钮可见
                 mUpdateBtn.setVisibility(View.INVISIBLE);
                 updateProcess.setVisibility(View.VISIBLE);
@@ -216,7 +321,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             } else {
                 mUpdateBtn.setVisibility(View.INVISIBLE);
                 updateProcess.setVisibility(View.VISIBLE);
-                Log.d("myWeather-netInfo", "网络连接异常");
                 Toast.makeText(this, "网络连接异常,请检查网络", Toast.LENGTH_SHORT);
             }
         }
@@ -257,11 +361,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("main_city_code", newCityCode);
             editor.commit();
-            Log.d("myWeather-City-Select:" , "选择城市代码为:" + newCityCode);
-
+            weatherDTO.setCurrentCityCode(newCityCode); // 更新现有城市代号
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE) {
                 Log.d("myWeather-NetInfo:" , "网络连接正常");
-                queryWeather(newCityCode); // **刷新页面
+                queryWeather(newCityCode); // 重新查询天气 刷新页面
             } else {
                 Log.d("myWeather-NetInfo:", "网络连接异常");
                 Toast.makeText(MainActivity.this, "网络连接异常", Toast.LENGTH_SHORT);
@@ -387,7 +490,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                     for(xmlPullParser.next();!xmlPullParser.getName().contentEquals("weather") && !xmlPullParser.getName().contentEquals("zhishu"); xmlPullParser.next()) {
                                         if(xmlPullParser.getName().contentEquals("type")) {
                                             xmlPullParser.next();
-                                            Log.d("test",xmlPullParser.getText());
                                             if(count < 3) {
                                                 futureWeather.setDayType(xmlPullParser.getText());
                                             } else {
@@ -396,7 +498,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                                         } else if(xmlPullParser.getName().contentEquals("fengxiang")) {
                                             xmlPullParser.next();
-                                            Log.d("test",xmlPullParser.getText());
                                             if(count < 3) {
                                                 futureWeather.setDayFengXiang(xmlPullParser.getText());
                                             } else {
@@ -404,7 +505,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                             }
                                         } else if(xmlPullParser.getName().contentEquals("fengli")) {
                                             xmlPullParser.next();
-                                            Log.d("test",xmlPullParser.getText());
                                             if(count < 3) {
                                                 futureWeather.setDayFengLi(xmlPullParser.getText());
                                             } else {
@@ -424,9 +524,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         }
                         break;
                 }
-
                 eventType = xmlPullParser.next();
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -436,69 +534,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     /**
-     * 初始化界面
-     */
-    public void initView() {
-        cityTv = (TextView) findViewById(R.id.city);
-        timeTv = (TextView) findViewById(R.id.time);
-        humidityTv = (TextView) findViewById(R.id.humidity);
-        weekTv = (TextView) findViewById(R.id.week_today);
-        pmDataTv = (TextView) findViewById(R.id.pm_data);
-        pmQualityTv = (TextView) findViewById(R.id.pm2_5_quality);
-        pmImg = (ImageView) findViewById(R.id.pm2_5_img);
-        temperatureTv = (TextView) findViewById(R.id.temperature);
-        climateTv = (TextView) findViewById(R.id.climate);
-        windTv = (TextView) findViewById(R.id.wind);
-        weatherImg = (ImageView) findViewById(R.id.weather_img);
-        wenduTv = (TextView) findViewById(R.id.temp_now);
-
-
-        // 未来天气
-        dates = new ArrayList<TextView>();
-        temperatures = new ArrayList<TextView>();
-        dayTypes = new ArrayList<TextView>();
-        fengLis = new ArrayList<TextView>();
-        dates.add(weekTv);
-        dates.add((TextView)findViewById(R.id.week_today1));
-        dates.add((TextView)findViewById(R.id.week_today2));
-        dates.add((TextView)findViewById(R.id.week_today3));
-        dates.add((TextView)findViewById(R.id.week_today4));
-
-        temperatures.add(temperatureTv);
-        temperatures.add((TextView)findViewById(R.id.temperature1));
-        temperatures.add((TextView)findViewById(R.id.temperature2));
-        temperatures.add((TextView)findViewById(R.id.temperature3));
-        temperatures.add((TextView)findViewById(R.id.temperature4));
-
-        dayTypes.add(climateTv);
-        dayTypes.add((TextView)findViewById(R.id.climate1));
-        dayTypes.add((TextView)findViewById(R.id.climate2));
-        dayTypes.add((TextView)findViewById(R.id.climate3));
-        dayTypes.add((TextView)findViewById(R.id.climate4));
-
-        fengLis.add((TextView) findViewById(R.id.wind1));
-        fengLis.add((TextView) findViewById(R.id.wind2));
-        fengLis.add((TextView) findViewById(R.id.wind3));
-        fengLis.add((TextView) findViewById(R.id.wind4));
-
-        cityTv.setText("N/A");
-        timeTv.setText("N/A");
-        humidityTv.setText("N/A");
-        weekTv.setText("N/A");
-        pmDataTv.setText("N/A");
-        pmQualityTv.setText("N/A");
-        temperatureTv.setText("N/A");
-        climateTv.setText("N/A");
-        windTv.setText("N/A");
-        wenduTv.setText("N/A");
-    }
-
-    /**
-     * 更新天气界面
+     * 更新天气UI界面
      * @param todayWeather
      */
     public void updateTodayWeather(TodayWeather todayWeather) {
         this.initView();
+        titleCityName.setText(todayWeather.getCityName() + "天气");
         cityTv.setText(todayWeather.getCityName());
         timeTv.setText(todayWeather.getUdpateTime() + "发布");
         humidityTv.setText("湿度" + todayWeather.getShidu());

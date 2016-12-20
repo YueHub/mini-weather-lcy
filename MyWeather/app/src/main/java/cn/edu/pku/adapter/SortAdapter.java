@@ -14,6 +14,7 @@ import cn.edu.pku.activities.R;
 import cn.edu.pku.model.SortModel;
 
 public class SortAdapter extends BaseAdapter implements SectionIndexer {
+
 	private List<SortModel> list = null;
 	private Context mContext;
 	
@@ -56,10 +57,10 @@ public class SortAdapter extends BaseAdapter implements SectionIndexer {
 			viewHolder = (ViewHolder) view.getTag();
 		}
 		
-		//根据position获取分类的首字母的Char ascii值
+		// 根据position获取分类的首字母的Char ascii值
 		int section = getSectionForPosition(position);
 		
-		//如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现
+		// 如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现
 		if(position == getPositionForSection(section)){
 			viewHolder.tvLetter.setVisibility(View.VISIBLE);
 			viewHolder.tvLetter.setText(mContent.getSortLetters());
@@ -72,14 +73,11 @@ public class SortAdapter extends BaseAdapter implements SectionIndexer {
 		return view;
 
 	}
-	
-
 
 	final static class ViewHolder {
 		TextView tvLetter;
 		TextView tvTitle;
 	}
-
 
 	/**
 	 * 根据ListView的当前位置获取分类的首字母的Char ascii值

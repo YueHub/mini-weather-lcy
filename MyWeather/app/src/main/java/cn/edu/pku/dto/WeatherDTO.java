@@ -15,5 +15,34 @@ public class WeatherDTO {
      */
     private String currentCityCode;
 
+    private volatile static WeatherDTO singleInstance;
 
+    private WeatherDTO(){}
+
+    public static WeatherDTO getSingleInstance() {
+        if(singleInstance == null) {
+            synchronized (WeatherDTO.class) {
+                if(singleInstance == null) {
+                    singleInstance = new WeatherDTO();
+                }
+            }
+        }
+        return singleInstance;
+    }
+
+    public String getCurrentCityName() {
+        return currentCityName;
+    }
+
+    public void setCurrentCityName(String currentCityName) {
+        this.currentCityName = currentCityName;
+    }
+
+    public String getCurrentCityCode() {
+        return currentCityCode;
+    }
+
+    public void setCurrentCityCode(String currentCityCode) {
+        this.currentCityCode = currentCityCode;
+    }
 }
