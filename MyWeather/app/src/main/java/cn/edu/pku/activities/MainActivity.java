@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.edu.pku.adapter.MyViewPagerAdapter;
+import cn.edu.pku.app.MyApplication;
 import cn.edu.pku.dto.WeatherDTO;
 import cn.edu.pku.model.FutureWeather;
 import cn.edu.pku.model.TodayWeather;
@@ -322,15 +323,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         pmQualityTv.setText(todayWeather.getQuality()); // pm2.5等级
 
         if(todayWeather.getQuality() != null) {
-            if(Double.parseDouble(todayWeather.getQuality()) <= 50) {
+            if(Double.parseDouble(todayWeather.getPm25()) <= 50) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);   // pm2.5图片更新
-            } else if(Double.parseDouble(todayWeather.getQuality()) <= 100) {
+            } else if(Double.parseDouble(todayWeather.getPm25()) <= 100) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
-            } else if(Double.parseDouble(todayWeather.getQuality()) <= 150) {
+            } else if(Double.parseDouble(todayWeather.getPm25()) <= 150) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
-            } else if(Double.parseDouble(todayWeather.getQuality()) <= 200) {
+            } else if(Double.parseDouble(todayWeather.getPm25()) <= 200) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
-            } else if(Double.parseDouble(todayWeather.getQuality()) <= 300) {
+            } else if(Double.parseDouble(todayWeather.getPm25()) <= 300) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
             } else {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
@@ -384,7 +385,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         // 点击城市定位按钮
         if(view.getId() == R.id.title_location) {
-            Log.d("TEST", "点击了定位按钮");
+            String currentCityName = weatherDTO.getCurrentCityName();   // 定位到的所在城市
+            if(currentCityName != null) {
+                MyApplication myApplication = (MyApplication) getApplication();
+                String currentCityCode = myApplication.getCityMap().get(currentCityName.split("市")[0]).toString();
+                queryWeather(currentCityCode);  // 更新数据
+                Toast.makeText(this, "目前所在城市:" + currentCityName, Toast.LENGTH_SHORT);
+            }
         }
 
         // 天气更新按钮

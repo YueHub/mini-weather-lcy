@@ -8,6 +8,8 @@ import com.baidu.location.Poi;
 
 import java.util.List;
 
+import cn.edu.pku.dto.WeatherDTO;
+
 /**
  * Created by Yue on 2016/12/12.
  */
@@ -65,6 +67,7 @@ public class MyLocationListener implements BDLocationListener {
         sb.append("\nlocationdescribe : ");
         sb.append(location.getLocationDescribe());// 位置语义化信息
         Log.d("目前所在城市", location.getCity());
+        WeatherDTO.getSingleInstance().setCurrentCityName(location.getCity());
         List<Poi> list = location.getPoiList();// POI数据
         if (list != null) {
             sb.append("\npoilist size = : ");

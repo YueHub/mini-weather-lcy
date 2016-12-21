@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.edu.pku.db.CityDB;
 import cn.edu.pku.model.City;
@@ -29,12 +31,17 @@ public class MyApplication extends Application {
      */
     private List<City> mCityList;
 
+    /**
+     * 城市Map
+     */
+    private Map<String, Object> cityMap;
+
     @Override
     public void onCreate() {
         super.onCreate();
         myApplication = this;
         mCityDB = openCityDB(); // 获取访问城市数据库的对象（/data/database1/city.db）
-        initCityList();
+        initCityListAndMap();
     }
 
     public static MyApplication getInstance() {
@@ -86,12 +93,13 @@ public class MyApplication extends Application {
     /**
      * 多线程初始化城市列表
      */
-    private void initCityList() {
-        mCityList = new ArrayList<City>();
+    private void initCityListAndMap() {
+        mCityList = new ArrayList<>();
+        cityMap = new LinkedHashMap<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                prepareCityList();
+                prepareCityListAndMap();
             }
         }).start();
     }
@@ -100,12 +108,23 @@ public class MyApplication extends Application {
      * 由城市数据库对象获取城市列表
      * @return
      */
-    private boolean prepareCityList() {
+    private boolean prepareCityListAndMap() {
         mCityList = mCityDB.getAllCity();
+        for(City city : mCityList) {
+            cityMap.put(city.getCity(), city.getNumber());
+        }
         return true;
     }
 
     public List<City> getmCityList() {
         return mCityList;
+    }
+
+    public Map<String, Object> getCityMap() {
+        return cityMap;
+    }
+
+    public void setCityMap(Map<String, Object> cityMap) {
+        this.cityMap = cityMap;
     }
 }
