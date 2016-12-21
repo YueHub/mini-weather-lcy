@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -42,6 +43,7 @@ import cn.edu.pku.model.FutureWeather;
 import cn.edu.pku.model.TodayWeather;
 import cn.edu.pku.service.AutoUpdateBinder;
 import cn.edu.pku.service.AutoUpdateService;
+import cn.edu.pku.util.CharacterParser;
 import cn.edu.pku.util.MyLocationListener;
 import cn.edu.pku.util.NetUtil;
 
@@ -317,15 +319,41 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         timeTv.setText(todayWeather.getUdpateTime() + "发布");
         humidityTv.setText("湿度" + todayWeather.getShidu());
         pmDataTv.setText(todayWeather.getPm25());
-        pmQualityTv.setText(todayWeather.getQuality());
+        pmQualityTv.setText(todayWeather.getQuality()); // pm2.5等级
+
+        if(todayWeather.getQuality() != null) {
+            if(Double.parseDouble(todayWeather.getQuality()) <= 50) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);   // pm2.5图片更新
+            } else if(Double.parseDouble(todayWeather.getQuality()) <= 100) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
+            } else if(Double.parseDouble(todayWeather.getQuality()) <= 150) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
+            } else if(Double.parseDouble(todayWeather.getQuality()) <= 200) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
+            } else if(Double.parseDouble(todayWeather.getQuality()) <= 300) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
+            } else {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+            }
+        }
+
         weekTv.setText(todayWeather.getDate());
+
         //temperatureTv.setText(todayWeather.getLow().split("低温")[1] + "~" + todayWeather.getHigh().split("高温")[1]);
         //climateTv.setText(todayWeather.getType());
         windTv.setText("风力" + todayWeather.getFengli());
         wenduTv.setText(todayWeather.getWendu()+"℃");
 
         int index = 0;
+        CharacterParser characterParser = CharacterParser.getInstance();    // 汉字转拼音的对象
         for(FutureWeather futureWeather : todayWeather.getFutureWeathers()) {
+            String typePinyin = characterParser.getSelling(futureWeather.getDayType()); // 汉字转换成拼音
+            String typeImageName = "biz_plugin_weather_" + typePinyin;
+            Resources res = getResources();
+            final String packageName = getPackageName();
+            int imageResId = res.getIdentifier(typeImageName, "drawable", packageName); // 根据图片名称获取资源ID
+            dayTypeImgs.get(index).setImageResource(imageResId);    // 设置天气图片
+
             dates.get(index).setText(futureWeather.getDate());
             temperatures.get(index).setText(futureWeather.getLow().split("低温")[1] + "~" + futureWeather.getHigh().split("高温")[1]);
             dayTypes.get(index).setText(futureWeather.getDayType());
