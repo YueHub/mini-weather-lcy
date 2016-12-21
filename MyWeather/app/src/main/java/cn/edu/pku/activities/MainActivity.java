@@ -84,6 +84,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private TextView temperatureTv, climateTv, windTv, wenduTv;
 
     /**
+     * 未来的天气图片
+     */
+    private List<ImageView> dayTypeImgs;
+
+    /**
      * 未来的日期
      */
     private List<TextView> dates;
@@ -242,10 +247,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         wenduTv = (TextView) findViewById(R.id.temp_now);
 
         // 未来天气
+        dayTypeImgs = new ArrayList<>();    // 未来天气状况图片
         dates = new ArrayList<>();
         temperatures = new ArrayList<>();   // 温度
         dayTypes = new ArrayList<>();   // 白天天气情况 晴天、雨天...
         fengLis = new ArrayList<>();    // 风力
+
+        dayTypeImgs.add(weatherImg);
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img1));
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img2));
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img3));
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img4));
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img5));
+        dayTypeImgs.add((ImageView) findViewById(R.id.weather_img6));
+
 
         dates.add(weekTv);  // 当前星期也在未来天气数据组中
         dates.add((TextView)findViewById(R.id.week_today1));
@@ -271,6 +286,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         dayTypes.add((TextView)findViewById(R.id.climate5));
         dayTypes.add((TextView)findViewById(R.id.climate6));
 
+        fengLis.add(windTv);
         fengLis.add((TextView) findViewById(R.id.wind1));
         fengLis.add((TextView) findViewById(R.id.wind2));
         fengLis.add((TextView) findViewById(R.id.wind3));
@@ -291,6 +307,43 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     /**
+     * 更新天气UI界面
+     * @param todayWeather
+     */
+    public void updateTodayWeather(TodayWeather todayWeather) {
+        this.initView();
+        titleCityName.setText(todayWeather.getCityName() + "天气");
+        cityTv.setText(todayWeather.getCityName());
+        timeTv.setText(todayWeather.getUdpateTime() + "发布");
+        humidityTv.setText("湿度" + todayWeather.getShidu());
+        pmDataTv.setText(todayWeather.getPm25());
+        pmQualityTv.setText(todayWeather.getQuality());
+        weekTv.setText(todayWeather.getDate());
+        //temperatureTv.setText(todayWeather.getLow().split("低温")[1] + "~" + todayWeather.getHigh().split("高温")[1]);
+        //climateTv.setText(todayWeather.getType());
+        windTv.setText("风力" + todayWeather.getFengli());
+        wenduTv.setText(todayWeather.getWendu()+"℃");
+
+        int index = 0;
+        for(FutureWeather futureWeather : todayWeather.getFutureWeathers()) {
+            dates.get(index).setText(futureWeather.getDate());
+            temperatures.get(index).setText(futureWeather.getLow().split("低温")[1] + "~" + futureWeather.getHigh().split("高温")[1]);
+            dayTypes.get(index).setText(futureWeather.getDayType());
+            fengLis.get(index).setText(futureWeather.getDayFengLi());
+            ++index;
+        }
+        // 设置后序几天的天气不显示
+        for(int i = index; i < 7; i++) {
+            dayTypeImgs.get(i).setImageBitmap(null);
+            dates.get(i).setText("");
+            temperatures.get(i).setText("");
+            dayTypes.get(i).setText("");
+            fengLis.get(i).setText("");
+        }
+        Toast.makeText(this, "数据更新成功", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
      * 点击事件监听
      * @param view
      */
@@ -303,7 +356,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         // 点击城市定位按钮
         if(view.getId() == R.id.title_location) {
-            mLocationClient.start();
+            Log.d("TEST", "点击了定位按钮");
         }
 
         // 天气更新按钮
@@ -516,7 +569,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                         ++count;
                                     }
                                 }
-                                if(xmlPullParser.getName().contentEquals("weather")) {
+                                if(xmlPullParser.getName().contentEquals("weather") || xmlPullParser.getName().contentEquals("zhishu")) {
                                     futureWeathers.add(futureWeather);
                                 }
                             }
@@ -531,35 +584,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         return todayWeather;
 
-    }
-
-    /**
-     * 更新天气UI界面
-     * @param todayWeather
-     */
-    public void updateTodayWeather(TodayWeather todayWeather) {
-        this.initView();
-        titleCityName.setText(todayWeather.getCityName() + "天气");
-        cityTv.setText(todayWeather.getCityName());
-        timeTv.setText(todayWeather.getUdpateTime() + "发布");
-        humidityTv.setText("湿度" + todayWeather.getShidu());
-        pmDataTv.setText(todayWeather.getPm25());
-        pmQualityTv.setText(todayWeather.getQuality());
-        weekTv.setText(todayWeather.getDate());
-        //temperatureTv.setText(todayWeather.getLow().split("低温")[1] + "~" + todayWeather.getHigh().split("高温")[1]);
-        //climateTv.setText(todayWeather.getType());
-        windTv.setText("风力" + todayWeather.getFengli());
-        wenduTv.setText(todayWeather.getWendu()+"℃");
-
-        int index = 0;
-        for(FutureWeather futureWeather : todayWeather.getFutureWeathers()) {
-            dates.get(index).setText(futureWeather.getDate());
-            temperatures.get(index).setText(futureWeather.getLow().split("低温")[1] + "~" + futureWeather.getHigh().split("高温")[1]);
-            dayTypes.get(index).setText(futureWeather.getDayType());
-            fengLis.get(index).setText(futureWeather.getDayFengLi());
-            ++index;
-        }
-        Toast.makeText(this, "数据更新成功", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -71,7 +71,15 @@ public class SelectCityActivity extends Activity implements View.OnClickListener
      */
     private CharacterParser characterParser;
 
+    /**
+     * 排序后的原始数据列表
+     */
     private List<SortModel> sourceDateList;
+
+    /**
+     * 过滤后的数据列表
+     */
+    List<SortModel> filterDateList;
 
     /**
      * 根据拼音来排列ListView里面的数据类
@@ -121,19 +129,6 @@ public class SelectCityActivity extends Activity implements View.OnClickListener
             }
         });*/
 
-        /**** 返回 ****/
-        sortListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SortModel sortCity = sourceDateList.get(position);
-                Intent intent = new Intent();
-                intent.putExtra("cityCode", sortCity.getCode());
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
-        /**** 返回 ****/
-
         MyApplication myApplication = (MyApplication)getApplication();
         mCityList = myApplication.getmCityList();
 //        String[] cities = new String[mCityList.size()];
@@ -150,6 +145,20 @@ public class SelectCityActivity extends Activity implements View.OnClickListener
         sortListView.setAdapter(adapter);   // 更新排序后的listView
 
         mClearEditText = (ClearEditText) findViewById(R.id.filter_edit);
+
+        filterDateList = sourceDateList;
+        /**** 返回 ****/
+        sortListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SortModel sortCity = filterDateList.get(position);
+                Intent intent = new Intent();
+                intent.putExtra("cityCode", sortCity.getCode());
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        /**** 返回 ****/
 
         //根据输入框输入值的改变来过滤搜索
         mClearEditText.addTextChangedListener(new TextWatcher() {
@@ -169,7 +178,6 @@ public class SelectCityActivity extends Activity implements View.OnClickListener
             }
         });
     }
-    /*******搜索框********/
 
     /**
      * 为ListView填充数据
@@ -202,7 +210,7 @@ public class SelectCityActivity extends Activity implements View.OnClickListener
      * @param filterStr
      */
     private void filterData(String filterStr){
-        List<SortModel> filterDateList = new ArrayList<SortModel>();
+        filterDateList = new ArrayList<SortModel>();
 
         if(TextUtils.isEmpty(filterStr)){
             filterDateList = sourceDateList;
