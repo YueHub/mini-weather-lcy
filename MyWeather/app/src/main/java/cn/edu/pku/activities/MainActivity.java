@@ -246,7 +246,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         Calendar mCalendar = Calendar.getInstance();
         if (mCalendar.get(Calendar.AM_PM) == 0){ // 如果是白天
             Resources resources = getResources();
-            Drawable btnDrawable = resources.getDrawable(R.drawable.night_background, null);
+            Drawable btnDrawable = resources.getDrawable(R.drawable.day_background, null);
             main.setBackground(btnDrawable);
         } else {
             Resources resources = getResources();

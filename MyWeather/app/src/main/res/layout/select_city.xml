@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/search_bar_edit_selector"
         android:drawableLeft="@drawable/search_bar_icon_normal"
-        android:hint="请输入关键字"
+        android:hint="@string/input_keyword"
         android:singleLine="true"
         android:textSize="20.0dip" />
 
