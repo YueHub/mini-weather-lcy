@@ -2,5 +2,5 @@
     <string name="app_name">未名天气</string>
     <string name="app_start_hello">欢迎使用</string>
     <string name="app_guide_use">开始使用</string>
-    <string name="">请输入关键字</string>
+    <string name="input_keyword">请输入关键字</string>
 </resources>
