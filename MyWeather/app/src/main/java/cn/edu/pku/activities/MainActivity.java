@@ -1,14 +1,10 @@
 package cn.edu.pku.activities;
 
-import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.icu.util.Calendar;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -39,6 +35,7 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.edu.pku.adapter.MyViewPagerAdapter;
@@ -240,10 +237,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 初始化界面
      */
-    @TargetApi(Build.VERSION_CODES.N)
     public void initView() {
         main = findViewById(R.id.main);
-        Calendar mCalendar = Calendar.getInstance();
+        /*Calendar mCalendar = Calendar.getInstance();
         if (mCalendar.get(Calendar.AM_PM) == 0){ // 如果是白天
             Resources resources = getResources();
             Drawable btnDrawable = resources.getDrawable(R.drawable.day_background, null);
@@ -252,6 +248,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             Resources resources = getResources();
             Drawable btnDrawable = resources.getDrawable(R.drawable.night_background, null);
             main.setBackground(btnDrawable);
+        }*/
+
+        int hours = new Date(System.currentTimeMillis()).getHours();
+        Log.d("HOURS", String.valueOf(hours));
+        if((hours >= 0 && hours <= 6) || hours >= 18 && hours < 24) {
+            main.setBackgroundResource(R.drawable.night_background);
+        } else {
+            main.setBackgroundResource(R.drawable.day_background);
         }
 
         cityTv = (TextView) findViewById(R.id.city);
