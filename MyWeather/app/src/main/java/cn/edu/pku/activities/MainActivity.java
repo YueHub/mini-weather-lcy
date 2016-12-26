@@ -1,10 +1,14 @@
 package cn.edu.pku.activities;
 
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -83,6 +87,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
      */
     private ProgressBar updateProcess;
 
+    private View main;
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv;
     private TextView temperatureTv, climateTv, windTv, wenduTv;
 
@@ -235,7 +240,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 初始化界面
      */
+    @TargetApi(Build.VERSION_CODES.N)
     public void initView() {
+        main = findViewById(R.id.main);
+        Calendar mCalendar = Calendar.getInstance();
+        if (mCalendar.get(Calendar.AM_PM) == 0){ // 如果是白天
+            Resources resources = getResources();
+            Drawable btnDrawable = resources.getDrawable(R.drawable.night_background, null);
+            main.setBackground(btnDrawable);
+        } else {
+            Resources resources = getResources();
+            Drawable btnDrawable = resources.getDrawable(R.drawable.night_background, null);
+            main.setBackground(btnDrawable);
+        }
+
         cityTv = (TextView) findViewById(R.id.city);
         timeTv = (TextView) findViewById(R.id.time);
         humidityTv = (TextView) findViewById(R.id.humidity);

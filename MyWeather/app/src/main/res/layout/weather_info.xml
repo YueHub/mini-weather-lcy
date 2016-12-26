@@ -69,10 +69,11 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@id/title"
-        android:background="@drawable/biz_plugin_weather_shenzhen_bg"
+        android:background="@drawable/day_background"
         android:orientation="vertical">
         <!-- 今日天气 -->
         <RelativeLayout

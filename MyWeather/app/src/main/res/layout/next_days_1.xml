@@ -16,6 +16,7 @@
             <!-- 天气情况图片示例 -->
             <ImageView
                 android:id="@+id/weather_img1"
+                android:layout_centerVertical="true"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
@@ -85,6 +86,7 @@
             <!-- 天气情况图片示例 -->
             <ImageView
                 android:id="@+id/weather_img2"
+                android:layout_centerVertical="true"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:src="@drawable/biz_plugin_weather_qing"/>
@@ -153,6 +155,7 @@
             <!-- 天气情况图片示例 -->
             <ImageView
                 android:id="@+id/weather_img3"
+                android:layout_centerVertical="true"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
